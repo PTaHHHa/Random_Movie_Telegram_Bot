@@ -43,7 +43,7 @@ def main(genre):
     return movie_list
 
 
-bot = telebot.TeleBot(token='937743751:AAEvngIl7cUmsVMPVKchIrcO0dl-HGz4-f0')
+bot = telebot.TeleBot(token='xxxxxx')
 
 
 def keyboard():
