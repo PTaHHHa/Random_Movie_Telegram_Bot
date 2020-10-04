@@ -1,12 +1,11 @@
-TODO: """РЕАЛИЗОВАТЬ САМОГО БОТА"""
 import logging
 import requests
-from telegram.ext import Updater, CallbackQueryHandler, CommandHandler
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
+import telebot
+import random
 from lxml import html
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+logger = telebot.logger
+telebot.logger.setLevel(logging.DEBUG)
 
 
 def main(genre):
@@ -44,38 +43,44 @@ def main(genre):
     return movie_list
 
 
-def start(update, context):
-    keyboard = [[InlineKeyboardButton("Option 1", callback_data='1'),
-                 InlineKeyboardButton("Option 2", callback_data='2')],
-
-                [InlineKeyboardButton("Option 3", callback_data='3')]]
-
-    reply_markup = InlineKeyboardMarkup(keyboard)
-
-    update.message.reply_text('Please choose:', reply_markup=reply_markup)
+bot = telebot.TeleBot(token='937743751:AAEvngIl7cUmsVMPVKchIrcO0dl-HGz4-f0')
 
 
-def button(update, context):
-    query = update.callback_query
-
-    # CallbackQueries need to be answered, even if no notification to the user is needed
-    # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
-    query.answer()
-
-    query.edit_message_text(text="Selected option: {}".format(query.data))
+def keyboard():
+    markup = telebot.types.InlineKeyboardMarkup(row_width=3)
+    button1 = telebot.types.InlineKeyboardButton(text='Комедия', callback_data='комедия')
+    button2 = telebot.types.InlineKeyboardButton(text='Драма', callback_data='драма')
+    markup.add(button1, button2)
+    return markup
 
 
-def help_command(update, context):
-    update.message.reply_text("Use /start to test this bot.")
+@bot.message_handler(commands=['help'])
+def fourlena(message):
+    bot.send_message(message.chat.id, f'Люблю тебя, зая!')
+    bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAAEBawdfeiKudSVydQwlIi2NN-o67oF57AACbwYAAnlc4glk6s9UEq6DMxsE')
 
 
-updater = Updater(token='xxxx', use_context=True)
-updater.dispatcher.add_handler(CommandHandler('start', start))
-updater.dispatcher.add_handler(CallbackQueryHandler(button))
-updater.dispatcher.add_handler(CommandHandler('help', help_command))
-updater.start_polling()
-updater.idle()
+@bot.message_handler(commands=['start'])
+def start_message(message):
+    bot.send_message(message.chat.id, f'Здравствуй, {message.from_user.first_name}!', reply_markup=keyboard())
 
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+    cqd = call.data
+    if cqd =='комедия':
+        bot.send_message(call.message.chat.id, text='Подбираю фильм')
+        result = main(cqd)
+        bot.send_message(call.message.chat.id, text=f'{random.choice(result)}')
+    elif cqd =='драма':
+        bot.send_message(call.message.chat.id, text='Подбираю фильм')
+        result = main(cqd)
+        bot.send_message(call.message.chat.id, text=f'{random.choice(result)}')
+    else:
+        bot.send_message(call.message.chat.id, text=f'Я тебя не знаю!')
+
+
+bot.polling()
 
 # if __name__ == '__main__':
 #     main('комедия')
