@@ -71,11 +71,19 @@ def callback_inline(call):
     if cqd =='комедия':
         bot.send_message(call.message.chat.id, text='Подбираю фильм')
         result = main(cqd)
-        bot.send_message(call.message.chat.id, text=f'{random.choice(result)}')
+        new_result = random.sample(result, 5)
+        new_str = [f"{i+1}. {new_result[i]}" for i in range(len(new_result))]
+        message_str = '\n'.join(new_str)
+        bot.send_message(call.message.chat.id, text=f'{message_str}')
+        bot.send_message(call.message.chat.id, text='Новый фильм', reply_markup=keyboard())
     elif cqd =='драма':
         bot.send_message(call.message.chat.id, text='Подбираю фильм')
         result = main(cqd)
-        bot.send_message(call.message.chat.id, text=f'{random.choice(result)}')
+        new_result = random.sample(result, 5)
+        new_str = [f"{i + 1}. {new_result[i]}" for i in range(len(new_result))]
+        message_str = '\n'.join(new_str)
+        bot.send_message(call.message.chat.id, text=f'{message_str}')
+        bot.send_message(call.message.chat.id, text='\nВыберите жанр', reply_markup=keyboard())
     else:
         bot.send_message(call.message.chat.id, text=f'Я тебя не знаю!')
 
