@@ -62,30 +62,28 @@ def fourlena(message):
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
-    bot.send_message(message.chat.id, f'Здравствуй, {message.from_user.first_name}!', reply_markup=keyboard())
+    bot.send_message(message.chat.id, f'Здравствуй, {message.from_user.first_name}!\nВыберите жанр.', reply_markup=keyboard())
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
     cqd = call.data
-    if cqd =='комедия':
-        bot.send_message(call.message.chat.id, text='Подбираю фильм')
-        result = main(cqd)
-        new_result = random.sample(result, 5)
-        new_str = [f"{i+1}. {new_result[i]}" for i in range(len(new_result))]
-        message_str = '\n'.join(new_str)
-        bot.send_message(call.message.chat.id, text=f'{message_str}')
-        bot.send_message(call.message.chat.id, text='Новый фильм', reply_markup=keyboard())
-    elif cqd =='драма':
-        bot.send_message(call.message.chat.id, text='Подбираю фильм')
-        result = main(cqd)
-        new_result = random.sample(result, 5)
-        new_str = [f"{i + 1}. {new_result[i]}" for i in range(len(new_result))]
-        message_str = '\n'.join(new_str)
-        bot.send_message(call.message.chat.id, text=f'{message_str}')
-        bot.send_message(call.message.chat.id, text='\nВыберите жанр', reply_markup=keyboard())
+    if cqd == 'комедия':
+        test(cqd, call)
+    elif cqd == 'драма':
+        test(cqd, call)
     else:
         bot.send_message(call.message.chat.id, text=f'Я тебя не знаю!')
+
+
+def test(cqd, call):
+    bot.send_message(call.message.chat.id, text='Подбираю фильм')
+    result = main(cqd)
+    new_result = random.sample(result, 5)
+    new_str = [f"{i + 1}. {new_result[i]}" for i in range(len(new_result))]
+    message_str = '\n'.join(new_str)
+    bot.send_message(call.message.chat.id, text=f'{message_str}')
+    bot.send_message(call.message.chat.id, text='\nВыберите жанр', reply_markup=keyboard())
 
 
 bot.polling()
