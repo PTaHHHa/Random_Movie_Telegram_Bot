@@ -1,7 +1,12 @@
 TODO: """РЕАЛИЗОВАТЬ САМОГО БОТА"""
+import logging
 import requests
+from telegram.ext import Updater, CallbackQueryHandler, CommandHandler
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 from lxml import html
-import time
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
 
 
 def main(genre):
@@ -35,9 +40,42 @@ def main(genre):
                     movie_list.append(name)
                 else:
                     pass
-    print(movie_list)
     r.close()
+    return movie_list
 
 
-if __name__ == '__main__':
-    main('комедия')
+def start(update, context):
+    keyboard = [[InlineKeyboardButton("Option 1", callback_data='1'),
+                 InlineKeyboardButton("Option 2", callback_data='2')],
+
+                [InlineKeyboardButton("Option 3", callback_data='3')]]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.message.reply_text('Please choose:', reply_markup=reply_markup)
+
+
+def button(update, context):
+    query = update.callback_query
+
+    # CallbackQueries need to be answered, even if no notification to the user is needed
+    # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
+    query.answer()
+
+    query.edit_message_text(text="Selected option: {}".format(query.data))
+
+
+def help_command(update, context):
+    update.message.reply_text("Use /start to test this bot.")
+
+
+updater = Updater(token='xxxx', use_context=True)
+updater.dispatcher.add_handler(CommandHandler('start', start))
+updater.dispatcher.add_handler(CallbackQueryHandler(button))
+updater.dispatcher.add_handler(CommandHandler('help', help_command))
+updater.start_polling()
+updater.idle()
+
+
+# if __name__ == '__main__':
+#     main('комедия')
