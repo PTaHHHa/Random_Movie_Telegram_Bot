@@ -64,7 +64,7 @@ def main(genre):
     return parsed_data
 
 
-bot = telebot.TeleBot(token='937743751:AAEvngIl7cUmsVMPVKchIrcO0dl-HGz4-f0')
+bot = telebot.TeleBot(token='xxxxxx')
 
 
 def keyboard():
